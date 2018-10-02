@@ -1,0 +1,78 @@
+Objectifs du TP
+===============
+
+Création d'un éditeur graphique avec les fonctionnalites de base  pour realiser de maniere la plus interactive possible un  dessin avec des items sélectionnables et déplaçables (cf ../Polys/poly-Qt-4.pdf).
+
+A la fin des deux séances de labos (4 UC) l'utilisateur de votre IHM doit pouvoir tracer, sauvegarder, charger un dessin à base d'objets graphiques (lignes,ellipses, rectangles, polygones et textes) déplaçables dont on peut pourra modifier les caractéristiques de contours et le mode de remplissage.
+
+Toutes les actions possibles sur l'IHM doivent être récensées dans la barre de menu. Les actions les plus fréquentes seront représentées dans la barre d'outils. L'utilisateur de l'IHM doit pouvoir sélectionner sur la zone cliente à l'aide d'un menu surgissant les actions possibles pour selectionner un type de tracé, une caractéristique de dessin etc ...
+
+Toute action irréversible devra avertir l'utilisateur avec des boîtes de dialogues.
+
+
+IHM Editeur graphique 
+=====================
+
+Doit contenir les actions :
+       - dans la barre d'actions (toutes les actions possibles)
+       - dans la barre d'outils (les actions les plus courantes)
+       - dans la zone cliente avec menu surgissant (les actions sur la zone client)
+
+MainWindow :  Selection d'actions
+=================================
+File : New (Warning dialog)
+       ------------
+       Open
+       Save        (File selection dialog)
+       Save As
+       -----------
+       Exit (Question dialog)
+Tools : Freehand
+        Line
+        Rectangle
+        Ellipse
+        Polygon
+        ----------
+        text 
+Style : Pen (submenu)
+          color  (Color selection  dialog)
+          line   (submenu)
+          width  (submenu or dialog)
+        Brush (submenu)
+          color  (Color selection  dialog)
+          fill (submenu or dialog))
+        Font (Font selection dialog)
+Help : About Us (Information dialog : Noms et Prenoms)
+       About Qt (Qt information dialog)
+Popup : Tools (cf barre d'actions Tools )
+        Style  (cf barre d'actions Style )
+        ---------
+        Erase (Warning dialog)
+
+SceneArea : Interaction
+========================
+
+Trace elastique : sans remplissage
+Trace final  : item graphique avec les styles selectionnes
+Selection : 
+   - d'un item graphique
+   - d'un groupe d'items graphiques
+
+Fichier README.txt
+==================
+Documentation sur :
+   - l'installation
+   - l'utilisation de l'IHM
+       - aide sur le tracé de dessin (polygone par exemple)
+   - problemes eventuels rencontres.
+
+Archive a fournir : Nom1_Nom2_Qt.tgz
+===================================
+ex : tar zcvf Dupond_pupont_Qt.tgz Dupond_Dupont_Qt/
+
+Sous le repertoire : /home/TP/TPrendu/nedelec/CAI/Qt
+Ne contient que le CODE SOURCE (Include/*.h, Src/*.cpp)
+et les données necessaire au projet (*.pro, Images/*.png Data/* ....)
+
+On doit pouvoir recreer le makefile et regenerer l'executable a partir de ces fichiers et, éventuellement, des instructions du fichier README.txt
+
