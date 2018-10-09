@@ -16,13 +16,17 @@
 
 #include "enums.h"
 
+#include <iostream>
+
+using namespace std;
+
 class SceneArea : public QGraphicsScene
 {
   Q_OBJECT  
 
   public:
     SceneArea( qreal x, qreal y, qreal width, qreal height, QObject * parent);
-//   PaintArea(QWidget *parent = 0);
+    ~SceneArea();
   public slots:
     void setCurrentTool(int);
     void setCurrentStyle(int);

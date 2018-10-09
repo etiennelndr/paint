@@ -7,6 +7,9 @@ SceneArea::SceneArea(qreal x, qreal y, qreal width, qreal height, QObject * pare
 
   addRect(QRectF(150,150,200,400));
 
+  // Avoid segfault
+  path = NULL;
+
   state = 0;
 
   QPolygonF _polygon;
@@ -14,6 +17,11 @@ SceneArea::SceneArea(qreal x, qreal y, qreal width, qreal height, QObject * pare
   addPolygon(_polygon);
 
   _item = NULL;
+}
+
+SceneArea::~SceneArea() {
+  cout << "~SceneArea()" << endl;
+  delete _item;
 }
 
 void SceneArea::mousePressEvent(QGraphicsSceneMouseEvent* evt) {
@@ -67,11 +75,10 @@ void SceneArea::mousePressEvent(QGraphicsSceneMouseEvent* evt) {
 }
 
 void SceneArea::mouseMoveEvent(QGraphicsSceneMouseEvent* evt) {
-//  qDebug() << "Scene::mouseMoveEvent(void)";
   if (_item) {
-     _item->setPos(evt->scenePos() - _offset);
+    _item->setPos(evt->scenePos() - _offset);
   }
-  _endPoint = evt->scenePos(); 
+  _endPoint = evt->scenePos();
 
   if ((_currentTool == TOOLS_MENU_ID_FREEHAND - 4) && path) {
     QPainterPath p = path->path();

@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
   public:
     MainWindow(QWidget *parent = 0);
+    ~MainWindow();
   private:
     SceneArea* _area;
     // Menus
@@ -70,6 +71,7 @@ Q_OBJECT
     void _penWidth();
     void _brushColor();
     void _brushFill();
+    void _font();
     // Help menu
     void _about();
     void _aboutQt();
