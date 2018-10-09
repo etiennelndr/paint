@@ -83,7 +83,7 @@ void MainWindow::_createMenus(void) {
   _styleMenu = menubar->addMenu(tr("&Style"));
   _penMenu   = _styleMenu->addMenu(tr("Pen"));
   _brushMenu = _styleMenu->addMenu(tr("Brush"));
-  _fontAction = _styleMenu->addAction(tr("Font"))
+  _fontAction = _styleMenu->addAction(tr("Font"));
   // Help menu
   _helpMenu  = menubar->addMenu(tr("&Help"));
 }
@@ -246,7 +246,7 @@ void MainWindow::_connectSignals(void) {
 
   connect(_penAction, SIGNAL(activated()), _signalMapperStyle, SLOT(map()));
   connect(_brushAction, SIGNAL(activated()), _signalMapperStyle, SLOT(map()));
-  connect(_fontAction, SIGNAL(triggered(), this, SLOT(_font())));
+  connect(_fontAction, SIGNAL(triggered()), this, SLOT(_font()));
 
   // Help actions
   connect(_aboutAction, SIGNAL(triggered()), this, SLOT(_about()));

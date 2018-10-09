@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QFileDialog>
+#include <QXmlStreamReader>
 #include <QStatusBar>
 #include <QAction>
 #include <QActionGroup>
