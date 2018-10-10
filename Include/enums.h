@@ -26,5 +26,40 @@ enum menusID {
 	STYLE_MENU_ID_FONT
 };
 
+enum widthID{
+	  THICKWIDTH_ID,
+	  NORMALWIDTH_ID,
+	  LARGEWIDTH_ID
+};
+
+enum penID{
+	  SOLIDLINE_ID,
+	  DASHLINE_ID,
+	  DOTLINE_ID
+};
+
+enum colorpID{
+	  PENBLUE_ID,
+	  PENRED_ID,
+	  PENGREEN_ID,
+	  PENBLACK_ID,
+	  PENYELLOW_ID
+};
+
+enum colorbID{
+	  BRUSHBLUE_ID,
+	  BRUSHRED_ID,
+	  BRUSHGREEN_ID,
+	  BRUSHBLACK_ID,
+	  BRUSHYELLOW_ID
+};
+
+enum fillbrushID{
+	  FILLBRUSH1_ID,
+	  FILLBRUSH2_ID,
+	  FILLBRUSH3_ID,
+	  FILLBRUSH4_ID
+};
+
 #endif
 

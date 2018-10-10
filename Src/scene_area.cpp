@@ -106,19 +106,19 @@ void SceneArea::mouseReleaseEvent(QGraphicsSceneMouseEvent* evt) {
       } case TOOLS_ID_LINE: {
         // Create a new line
         qDebug() << "Line";
-        QGraphicsLineItem *line = addLine(_startPoint.x(), _startPoint.y(), _endPoint.x(), _endPoint.y());
+        QGraphicsLineItem *line = addLine(_startPoint.x(), _startPoint.y(), _endPoint.x(), _endPoint.y(), _pen ); 
         line->setFlag(QGraphicsItem::ItemIsMovable);
         break;
       } case TOOLS_ID_RECTANGLE: {
         // Create a new rectangle
         qDebug() << "Rectangle";
-        QGraphicsRectItem *rect = addRect(_startPoint.x(), _startPoint.y(), _endPoint.x() - _startPoint.x(), _endPoint.y() - _startPoint.y());
+        QGraphicsRectItem *rect = addRect(_startPoint.x(), _startPoint.y(), _endPoint.x() - _startPoint.x(), _endPoint.y() - _startPoint.y(), _pen , _brush);
         rect->setFlag(QGraphicsItem::ItemIsMovable);
         break;
       } case TOOLS_ID_CIRCLE: {
         // Create a new circle
         qDebug() << "Circle/Ellipse";
-        QGraphicsEllipseItem *ellipse = addEllipse(_startPoint.x(), _startPoint.y(), _endPoint.x() - _startPoint.x(), _endPoint.y() - _startPoint.y());
+        QGraphicsEllipseItem *ellipse = addEllipse(_startPoint.x(), _startPoint.y(), _endPoint.x() - _startPoint.x(), _endPoint.y() - _startPoint.y(), _pen , _brush);
         ellipse->setFlag(QGraphicsItem::ItemIsMovable);
         break;
       } case TOOLS_ID_POLYGON: {
@@ -154,9 +154,163 @@ void SceneArea::setCurrentTool(int tool) {
   qDebug () << _currentTool;
 }
 
-void SceneArea::setCurrentStyle(int style) {
-  qDebug() << "Scene::setCurrentStyle(int style)";
-  _currentStyle = style;
-  qDebug () << _currentStyle;
+int SceneArea::getCurrentTool() {
+  qDebug() << "PaintArea::getCurrentTool(int tool)";
+  qDebug () << _currentTool;
+  return _currentTool ;
+}
+
+int SceneArea::getCurrentPen() {
+  qDebug() << "PaintArea::getCurrentToolPen(int tool)";
+  qDebug () << _currentToolPen;
+  return _currentToolPen ;
+
+}
+
+QPen SceneArea::getPen() {
+    return _pen;
+}
+
+void SceneArea::setCurrentPen(int tool) {
+  std::cout  << "in set current" << std::endl;
+  switch(tool){
+      case 0 : 
+        _pen.setStyle(Qt::SolidLine);
+      break;
+      case 1 :
+        _pen.setStyle(Qt::DashLine);
+      break;
+      case 2 :
+        _pen.setStyle(Qt::DotLine);
+      break;
+      default :
+        //_pen.setStyle(Qt::SolidLine);
+      break;
+  }
+}
+
+int SceneArea::getCurrentWidth() {
+  qDebug() << "PaintArea::getCurrentToolPen(int tool)";
+  qDebug () << _currentToolWidth;
+  return _currentToolWidth ;
+
+}
+
+void SceneArea::setCurrentWidth(int tool) {
+  std::cout  << "in set current" << std::endl;
+  switch(tool){
+      case 0 : 
+        _pen.setWidth(2);
+      break;
+      case 1 :
+        _pen.setWidth(6);
+      break;
+      case 2 :
+        _pen.setWidth(10);
+      break;
+      default :
+        //_pen.setStyle(Qt::SolidLine);
+      break;
+  }
+}
+
+int SceneArea::getCurrentColorP() {
+  qDebug() << "PaintArea::getCurrentToolPen(int tool)";
+  qDebug () << _currentPColor;
+  return _currentPColor ;
+
+}
+
+void SceneArea::setCurrentColorP(int tool) {
+
+  _currentPColor = tool;
+  qDebug() << "okookok";
+  //_color = QColorDialog::getColor(Qt::yellow, this );
+  switch(tool){
+      case 0 : 
+        _pen.setColor(Qt::blue);
+      break;
+      case 1 :
+        _pen.setColor(Qt::red);
+      break;
+      case 2 :
+        _pen.setColor(Qt::green);
+      break;
+      case 3 :
+        _pen.setColor(Qt::black);
+      break;
+      case 4 :
+        _pen.setColor(Qt::yellow);
+      break;
+      default :
+        //_pen.setStyle(Qt::SolidLine);
+      break;
+  }
+}
+
+int SceneArea::getCurrentColorB() {
+  qDebug() << "PaintArea::getCurrentToolPen(int tool)";
+  qDebug () << _currentBColor;
+  return _currentBColor ;
+
+}
+
+void SceneArea::setCurrentColorB(int tool) {
+  //_color = QColorDialog::getColor(Qt::yellow, this );
+  switch(tool){
+      case 0 : 
+        // _brush.setStyle(Qt::SolidPattern);
+        _brush.setColor(Qt::blue);
+      break;
+      case 1 :
+        // _brush.setStyle(Qt::SolidPattern);
+        _brush.setColor(Qt::red);
+      break;
+      case 2 :
+        // _brush.setStyle(Qt::SolidPattern);
+        _brush.setColor(Qt::green);
+      break;
+      case 3 :
+        // _brush.setStyle(Qt::SolidPattern);
+        _brush.setColor(Qt::black);
+      break;
+      case 4 :
+        // _brush.setStyle(Qt::SolidPattern);
+        _brush.setColor(Qt::yellow);
+      break;
+      default :
+        //_pen.setStyle(Qt::SolidLine);
+      break;
+  }
+}
+
+
+int SceneArea::getCurrentFillBrush() {
+  qDebug() << "PaintArea::getCurrentToolPen(int tool)";
+  qDebug () << _currentFillBrush;
+  return _currentFillBrush ;
+
+}
+
+void SceneArea::setCurrentFillBrush(int tool) {
+  qDebug() << "okookok";
+  //_color = QColorDialog::getColor(Qt::yellow, this );
+  switch(tool){
+      case 0 : 
+        _brush.setStyle(Qt::SolidPattern);
+      break;
+      case 1 :
+        _brush.setStyle(Qt::HorPattern);
+      break;
+      case 2 :
+        _brush.setStyle(Qt::VerPattern);
+      break;
+      case 3 :
+        _brush.setStyle(Qt::NoBrush);
+      break;
+      default :
+        //_pen.setStyle(Qt::SolidLine);
+      break;
+  }
 }
 

@@ -54,12 +54,21 @@ Q_OBJECT
     QMenu *_brushMenu;
     QAction *_brushAction, *_brushColorAction, *_brushFillAction;
     QAction *_fontAction;
+
+    QMenu *_colorPMenu, *_colorBMenu, *_lineMenu, *_widthMenu, *_fontMenu, *_popUpMenu, *_fillbrushMenu;
+
+    QAction *_SolidLine, *_DashLine, *_DotLine;
+    QAction *_ThickWidth, *_NormalWidth, *_LargeWidth;
+    QAction *_penColorBlue, *_penColorRed, *_penColorGreen, *_penColorBlack, *_penColorYellow;
+    QAction *_brushColorBlue, *_brushColorRed, *_brushColorGreen, *_brushColorBlack, *_brushColorYellow;
+    QAction *_fillbrush1, *_fillbrush2, *_fillbrush3, *_fillbrush4;
+
     // Help menu actions
     QAction *_aboutAction, *_aboutQtAction;
 
-    QActionGroup *_toolsQag, *_styleQag;
+    QActionGroup *_toolsQag, *_toolsLine, *_toolsWidth,*_penColor,*_brushColor ,*_fillbrushgroup;
     QSignalMapper *_signalMapperTool;
-    QSignalMapper *_signalMapperStyle;
+    QSignalMapper *_lineMapper,*_widthMapper,*_colorPMapper,*_colorBMapper,*_fillbrushMapper;
   private slots :
     // File menu
     void _newFile();
@@ -67,19 +76,16 @@ Q_OBJECT
     void _save();
     void _saveAs();
     void _exit();
-    // Style menu
-    void _penColor();
-    void _penLine();
-    void _penWidth();
-    void _brushColor();
-    void _brushFill();
-    void _font();
     // Help menu
     void _about();
     void _aboutQt();
   signals:
     void toolMapped(int digit);
-    void styleMapped(int digit);
+    void toolPenMapped(int digit);
+    void toolWidthMapped(int digit);
+    void toolColorPMapped(int digit);
+    void toolColorBMapped(int digit);
+    void stylefillbrushMapped(int digit);
 };
 
 

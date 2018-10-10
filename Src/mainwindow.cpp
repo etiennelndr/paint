@@ -9,10 +9,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   QGraphicsView *view = new QGraphicsView();
   _area = new SceneArea (0, 0, 600, 800, this);
   _area->setCurrentTool(TOOLS_ID_FREEHAND);
-  _area->setCurrentStyle(STYLE_MENU_ID_PEN);
-  QGraphicsTextItem * text = _area->addText("Tu peux me deplacer !");
-  text->setPos(100, 100);
-  text->setVisible(true);
+
   view->setScene(_area);
   setCentralWidget(view);
   statusBar()->showMessage(tr("Ready"));
@@ -25,9 +22,35 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   _signalMapperTool->setMapping(_polygonAct,   TOOLS_ID_POLYGON); 
   _signalMapperTool->setMapping(_textAct,      TOOLS_ID_TEXT);
 
-  _signalMapperStyle = new QSignalMapper(this);
-  _signalMapperStyle->setMapping(_penAction,   STYLE_MENU_ID_PEN);
-  _signalMapperStyle->setMapping(_brushAction, STYLE_MENU_ID_BRUSH);
+  _lineMapper = new QSignalMapper(this);
+  _lineMapper->setMapping(_SolidLine, SOLIDLINE_ID);
+  _lineMapper->setMapping(_DashLine,  DASHLINE_ID);
+  _lineMapper->setMapping(_DotLine,   DOTLINE_ID);
+
+  _widthMapper = new QSignalMapper(this);
+  _widthMapper->setMapping(_ThickWidth,   THICKWIDTH_ID);
+  _widthMapper->setMapping(_NormalWidth,  NORMALWIDTH_ID);
+  _widthMapper->setMapping(_LargeWidth,   LARGEWIDTH_ID);
+
+  _colorPMapper = new QSignalMapper(this);
+  _colorPMapper->setMapping(_penColorBlue,    PENBLUE_ID);
+  _colorPMapper->setMapping(_penColorRed,     PENRED_ID);
+  _colorPMapper->setMapping(_penColorGreen,   PENGREEN_ID);
+  _colorPMapper->setMapping(_penColorBlack,   PENBLACK_ID);
+  _colorPMapper->setMapping(_penColorYellow,  PENYELLOW_ID);
+  
+  _colorBMapper = new QSignalMapper(this);
+  _colorBMapper->setMapping(_brushColorBlue,    BRUSHBLUE_ID);
+  _colorBMapper->setMapping(_brushColorRed,     BRUSHRED_ID);
+  _colorBMapper->setMapping(_brushColorGreen,   BRUSHGREEN_ID);
+  _colorBMapper->setMapping(_brushColorBlack,   BRUSHBLACK_ID);
+  _colorBMapper->setMapping(_brushColorYellow,  BRUSHYELLOW_ID);
+
+  _fillbrushMapper = new QSignalMapper(this);
+  _fillbrushMapper->setMapping(_fillbrush1, FILLBRUSH1_ID);
+  _fillbrushMapper->setMapping(_fillbrush2, FILLBRUSH2_ID);
+  _fillbrushMapper->setMapping(_fillbrush3, FILLBRUSH3_ID);
+  _fillbrushMapper->setMapping(_fillbrush4, FILLBRUSH4_ID);
 
   _connectSignals();
 }
@@ -62,38 +85,37 @@ MainWindow::~MainWindow() {
   delete _fontAction;
   
   delete _styleMenu;
-  cout << "here 2" << endl;
   // Help menu actions
   delete _aboutAction; delete _aboutQtAction;
 
-  delete _toolsQag; delete _styleQag;
+  delete _toolsQag;
   delete _signalMapperTool;
-  delete _signalMapperStyle;
-
-  cout << "~MainWindow()" << endl;
 }
 
 void MainWindow::_createMenus(void) {
+  qDebug() << "_createMenus()";
   QMenuBar* menubar = menuBar();
-  // File menu
-  _fileMenu  = menubar->addMenu(tr("&File"));
-  // Tools menu
+  _fileMenu = menubar->addMenu(tr("&File"));
   _toolsMenu = menubar->addMenu(tr("&Tools"));
-  // Style menu
   _styleMenu = menubar->addMenu(tr("&Style"));
-  _penMenu   = _styleMenu->addMenu(tr("Pen"));
-  _brushMenu = _styleMenu->addMenu(tr("Brush"));
-  _fontAction = _styleMenu->addAction(tr("Font"));
-  // Help menu
-  _helpMenu  = menubar->addMenu(tr("&Help"));
+  _helpMenu = menubar->addMenu(tr("&Help"));
+  _penMenu = _styleMenu->addMenu(tr("&Pen"));
+  _lineMenu = _penMenu->addMenu(tr("&Line"));
+  _widthMenu = _penMenu->addMenu(tr("&Width"));
+  _brushMenu = _styleMenu->addMenu(tr("&Brush"));
+  _fillbrushMenu = _brushMenu->addMenu(tr("&Fill"));
+  _colorPMenu = _penMenu->addMenu(tr("&Color"));
+  _colorBMenu = _brushMenu->addMenu(tr("&Color"));
 }
 
 void MainWindow::_createToolbars(void) {
+  qDebug() << "_createToolbars()";
   _toolBar = addToolBar(tr("File"));
 }
 
 // ---------------- ACTIONS ----------------
 void MainWindow::_createActions(void) {
+  qDebug() << "_createActions()";
   // File actions
   _createFileActions();
   // Tools actions
@@ -146,10 +168,27 @@ void MainWindow::_createToolsActions(void) {
   // Text
   _textAct = new QAction(tr("&Text"), this);
   _textAct->setCheckable(true);
+
+  _toolsLine = new QActionGroup(this);
+  _SolidLine = new QAction(tr("&SolidLine"),this);
+  _DashLine = new QAction(tr("&DashLine"),this);
+  _DotLine = new QAction(tr("&DotLine"),this);
+
+  _SolidLine->setCheckable(true);
+  _DashLine->setCheckable(true);
+  _DotLine->setCheckable(true);
+  
+  _toolsWidth =new QActionGroup(this);
+  _ThickWidth =new QAction(tr("&Thick"),this);
+  _NormalWidth=new QAction(tr("&Normal"),this);
+  _LargeWidth=new QAction(tr("&Large"),this);
+
+  _ThickWidth->setCheckable(true);
+  _NormalWidth->setCheckable(true);
+  _LargeWidth->setCheckable(true);
 }
 
 void MainWindow::_createStyleActions(void) {
-  _styleQag = new QActionGroup(this);
   // Pen menu
   _penAction      = new QAction(tr("Pen"), this);
   _penAction->setCheckable(true);
@@ -162,6 +201,43 @@ void MainWindow::_createStyleActions(void) {
   _brushAction->setCheckable(true);
   _brushColorAction = new QAction(tr("Color"), this);
   _brushFillAction  = new QAction(tr("Fill"), this);
+
+  _fillbrushgroup =new QActionGroup(this);
+  _fillbrush1 =new QAction(tr("&Solid"),this);
+  _fillbrush2=new QAction(tr("&Vertical"),this);
+  _fillbrush3=new QAction(tr("&Horizontal"),this);
+  _fillbrush4=new QAction(tr("&Empty"),this);
+
+  _fillbrush1->setCheckable(true);
+  _fillbrush2->setCheckable(true);
+  _fillbrush3->setCheckable(true);
+  _fillbrush4->setCheckable(true);
+
+  _penColor =new QActionGroup(this);
+  _penColorBlue =new QAction(tr("&Blue"),this);
+  _penColorRed=new QAction(tr("&Red"),this);
+  _penColorGreen=new QAction(tr("&Green"),this);
+  _penColorBlack=new QAction(tr("&Black"),this);
+  _penColorYellow=new QAction(tr("&Yellow"),this);
+
+  _penColorBlue->setCheckable(true);
+  _penColorRed->setCheckable(true);
+  _penColorGreen->setCheckable(true);
+  _penColorBlack->setCheckable(true);
+  _penColorYellow->setCheckable(true);
+
+  _brushColor =new QActionGroup(this);
+  _brushColorBlue =new QAction(tr("&Blue"),this);
+  _brushColorRed=new QAction(tr("&Red"),this);
+  _brushColorGreen=new QAction(tr("&Green"),this);
+  _brushColorBlack=new QAction(tr("&Black"),this);
+  _brushColorYellow=new QAction(tr("&Yellow"),this);
+
+  _brushColorBlue->setCheckable(true);
+  _brushColorRed->setCheckable(true);
+  _brushColorGreen->setCheckable(true);
+  _brushColorBlack->setCheckable(true);
+  _brushColorYellow->setCheckable(true);
 }
 
 void MainWindow::_createHelpActions(void) {
@@ -176,12 +252,15 @@ void MainWindow::_createHelpActions(void) {
 }
 
 void MainWindow::_connectActions(void) {
+  qDebug() << "_connectActions()";
   // File Menu
   _fileMenu->addAction(_newAction);
   _fileMenu->addAction(_openAction);
   _fileMenu->addAction(_saveAction);
   _fileMenu->addAction(_saveAsAction);
   _fileMenu->addAction(_exitAction);
+
+  qDebug() << "OK";
 
   // Tools menu
   _toolsMenu->addAction(_freehandAct);
@@ -198,19 +277,7 @@ void MainWindow::_connectActions(void) {
   _toolsQag->addAction(_polygonAct);
   _toolsQag->addAction(_textAct);
 
-  // Tools actions
-  // Pen menu
-  _penMenu->addAction(_penAction);
-  _penMenu->addAction(_penColorAction);
-  _penMenu->addAction(_penLineAction);
-  _penMenu->addAction(_penWidthAction);
-  // Brush menu
-  _brushMenu->addAction(_brushAction);
-  _brushMenu->addAction(_brushColorAction);
-  _brushMenu->addAction(_brushFillAction);
-
-  _styleQag->addAction(_penAction);
-  _styleQag->addAction(_brushAction);
+  qDebug() << "OK2";
 
   // Help Menu
   _helpMenu->addAction(_aboutAction);
@@ -219,6 +286,56 @@ void MainWindow::_connectActions(void) {
   _toolBar->addAction(_newAction);
   _toolBar->addAction(_openAction);
   _toolBar->addAction(_saveAction);
+
+  _toolsLine->addAction(_SolidLine);
+  _toolsLine->addAction(_DashLine);
+  _toolsLine->addAction(_DotLine);
+
+  _lineMenu->addAction(_SolidLine);
+  _lineMenu->addAction(_DashLine);
+  _lineMenu->addAction(_DotLine);
+
+  _toolsWidth->addAction(_ThickWidth);
+  _toolsWidth->addAction(_NormalWidth);
+  _toolsWidth->addAction(_LargeWidth);
+
+  _widthMenu->addAction(_ThickWidth);
+  _widthMenu->addAction(_NormalWidth);
+  _widthMenu->addAction(_LargeWidth);
+
+  _colorPMenu->addAction(_penColorBlue);
+  _colorPMenu->addAction(_penColorRed);
+  _colorPMenu->addAction(_penColorGreen);
+  _colorPMenu->addAction(_penColorBlack);
+  _colorPMenu->addAction(_penColorYellow);
+
+  _penColor->addAction(_penColorBlue);
+  _penColor->addAction(_penColorRed);
+  _penColor->addAction(_penColorGreen);
+  _penColor->addAction(_penColorBlack);
+  _penColor->addAction(_penColorYellow);
+
+  _colorBMenu->addAction(_brushColorBlue);
+  _colorBMenu->addAction(_brushColorRed);
+  _colorBMenu->addAction(_brushColorGreen);
+  _colorBMenu->addAction(_brushColorBlack);
+  _colorBMenu->addAction(_brushColorYellow);
+
+  _brushColor->addAction(_brushColorBlue);
+  _brushColor->addAction(_brushColorRed);
+  _brushColor->addAction(_brushColorGreen);
+  _brushColor->addAction(_brushColorBlack);
+  _brushColor->addAction(_brushColorYellow);
+
+  _fillbrushMenu->addAction(_fillbrush1);
+  _fillbrushMenu->addAction(_fillbrush2);
+  _fillbrushMenu->addAction(_fillbrush3);
+  _fillbrushMenu->addAction(_fillbrush4);
+
+  _fillbrushgroup->addAction(_fillbrush1);
+  _fillbrushgroup->addAction(_fillbrush2);
+  _fillbrushgroup->addAction(_fillbrush3);
+  _fillbrushgroup->addAction(_fillbrush4);
 }
 
 void MainWindow::_connectSignals(void) {
@@ -244,10 +361,6 @@ void MainWindow::_connectSignals(void) {
   connect(_brushColorAction, SIGNAL(triggered()), this, SLOT(_brushColor()));
   connect(_brushFillAction, SIGNAL(triggered()), this, SLOT(_brushFill()));
 
-  connect(_penAction, SIGNAL(activated()), _signalMapperStyle, SLOT(map()));
-  connect(_brushAction, SIGNAL(activated()), _signalMapperStyle, SLOT(map()));
-  connect(_fontAction, SIGNAL(triggered()), this, SLOT(_font()));
-
   // Help actions
   connect(_aboutAction, SIGNAL(triggered()), this, SLOT(_about()));
   connect(_aboutQtAction, SIGNAL(triggered()), this, SLOT(_aboutQt()));
@@ -255,8 +368,45 @@ void MainWindow::_connectSignals(void) {
   connect(_signalMapperTool, SIGNAL(mapped(int)), this, SIGNAL(toolMapped(int)));
   connect(this, SIGNAL(toolMapped(int)), _area, SLOT(setCurrentTool(int)));
 
-  connect(_signalMapperStyle, SIGNAL(mapped(int)), this, SIGNAL(styleMapped(int)));
-  connect(this, SIGNAL(styleMapped(int)), _area, SLOT(setCurrentStyle(int)));
+  connect(_SolidLine,SIGNAL(activated()),_lineMapper, SLOT(map()));
+  connect(_DashLine,SIGNAL(activated()),_lineMapper, SLOT(map()));
+  connect(_DotLine,SIGNAL(activated()),_lineMapper, SLOT(map()));
+
+  connect(_lineMapper,SIGNAL(mapped(int)), this, SIGNAL(toolPenMapped(int)));
+  connect(this, SIGNAL(toolPenMapped(int)), _area, SLOT(setCurrentPen(int)) ); 
+
+  connect(_ThickWidth,SIGNAL(activated()),_widthMapper, SLOT(map()));
+  connect(_NormalWidth,SIGNAL(activated()),_widthMapper, SLOT(map()));
+  connect(_LargeWidth,SIGNAL(activated()),_widthMapper, SLOT(map()));
+
+  connect(_widthMapper,SIGNAL(mapped(int)), this, SIGNAL(toolWidthMapped(int)));
+  connect(this, SIGNAL(toolWidthMapped(int)), _area, SLOT(setCurrentWidth(int)) );
+
+  connect(_penColorBlue,SIGNAL(activated()),_colorPMapper, SLOT(map()));
+  connect(_penColorRed,SIGNAL(activated()),_colorPMapper, SLOT(map()));
+  connect(_penColorGreen,SIGNAL(activated()),_colorPMapper, SLOT(map()));
+  connect(_penColorBlack,SIGNAL(activated()),_colorPMapper, SLOT(map()));
+  connect(_penColorYellow,SIGNAL(activated()),_colorPMapper, SLOT(map()));  
+
+  connect(_colorPMapper,SIGNAL(mapped(int)), this, SIGNAL(toolColorPMapped(int)));
+  connect(this, SIGNAL(toolColorPMapped(int)), _area, SLOT(setCurrentColorP(int)) ); 
+
+  connect(_brushColorBlue,SIGNAL(activated()),_colorBMapper, SLOT(map()));
+  connect(_brushColorRed,SIGNAL(activated()),_colorBMapper, SLOT(map()));
+  connect(_brushColorGreen,SIGNAL(activated()),_colorBMapper, SLOT(map()));
+  connect(_brushColorBlack,SIGNAL(activated()),_colorBMapper, SLOT(map()));
+  connect(_brushColorYellow,SIGNAL(activated()),_colorBMapper, SLOT(map()));  
+
+  connect(_colorBMapper,SIGNAL(mapped(int)), this, SIGNAL(toolColorBMapped(int)));
+  connect(this, SIGNAL(toolColorBMapped(int)), _area, SLOT(setCurrentColorB(int)) ); 
+
+  connect(_fillbrush1,SIGNAL(activated()),_fillbrushMapper, SLOT(map()));
+  connect(_fillbrush2,SIGNAL(activated()),_fillbrushMapper, SLOT(map()));
+  connect(_fillbrush3,SIGNAL(activated()),_fillbrushMapper, SLOT(map()));
+  connect(_fillbrush4,SIGNAL(activated()),_fillbrushMapper, SLOT(map()));
+
+  connect(_fillbrushMapper,SIGNAL(mapped(int)), this, SIGNAL(stylefillbrushMapped(int)));
+  connect(this, SIGNAL(stylefillbrushMapped(int)), _area, SLOT(setCurrentFillBrush(int)) ); 
 }
 
 // FILE METHODS
@@ -310,8 +460,7 @@ void MainWindow::_open(void) {
         _area->setCurrentColorP(color);
         QPen pen = _area->getPen();
         switch (number) {
-          case 3: 
-          {
+          case 3:  {
             int x=xmlReader.attributes().value("x").toString().toInt();
             int y=xmlReader.attributes().value("y").toString().toInt();
             int w=xmlReader.attributes().value("w").toString().toInt();
@@ -323,9 +472,7 @@ void MainWindow::_open(void) {
               rectangle->pen().setStyle(Qt::DashDotDotLine);
             }
             break;
-          }
-          case 4:
-          {
+          } case 4: {
             int x=xmlReader.attributes().value("x").toString().toInt();
             int y=xmlReader.attributes().value("y").toString().toInt();
             int w=xmlReader.attributes().value("w").toString().toInt();
@@ -337,9 +484,7 @@ void MainWindow::_open(void) {
             circle->pen().setStyle(Qt::DashDotDotLine);
             }
             break;
-          }
-          case 5:
-          {
+          } case 5: {
             QVector<QPointF> points(0);
             QPointF point;
             int nbPoints=xmlReader.attributes().value("size").toString().toInt();
@@ -360,9 +505,7 @@ void MainWindow::_open(void) {
               polygon->pen().setStyle(Qt::DashDotDotLine);
             }
             break;
-          }
-          case 6:
-          {
+          } case 6: {
             int x=xmlReader.attributes().value("x").toString().toInt();
             int y=xmlReader.attributes().value("y").toString().toInt();
             int w=xmlReader.attributes().value("w").toString().toInt();
@@ -374,9 +517,7 @@ void MainWindow::_open(void) {
             line->pen().setStyle(Qt::DashDotDotLine);
             } 
             break;
-          }
-          case 8 :
-          {
+          } case 8 : {
             int x=xmlReader.attributes().value("x").toString().toInt();
             int y=xmlReader.attributes().value("y").toString().toInt();
             QString text=xmlReader.attributes().value("text").toString();
@@ -416,8 +557,7 @@ void MainWindow::_save(void) {
         xmlWriter.writeAttribute("type", QString::number(number));
         xmlWriter.writeAttribute("color", QString::number(_area->items().value(i)->data(0).toInt()));
         switch(number) {
-          case 3:
-          {
+          case 3: {
             qDebug() << "Rectangle";
             QGraphicsRectItem *rectangle;
             rectangle = qgraphicsitem_cast<QGraphicsRectItem*>(_area->items().value(i));
@@ -431,9 +571,7 @@ void MainWindow::_save(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(rectangle->pen().style()));
             break;
-          }
-          case 4:
-          {
+          } case 4: {
             qDebug() << "Circle";
             QGraphicsEllipseItem *circle;
             circle = qgraphicsitem_cast<QGraphicsEllipseItem*>(_area->items().value(i));
@@ -447,9 +585,7 @@ void MainWindow::_save(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(circle->pen().style()));
             break;
-          }
-          case 5:
-          {
+          } case 5: {
             qDebug() << "Polygon";
             QGraphicsPolygonItem *polygon;
             polygon = qgraphicsitem_cast<QGraphicsPolygonItem*>(_area->items().value(i));
@@ -471,9 +607,7 @@ void MainWindow::_save(void) {
             }
             xmlWriter.writeAttribute("style", QString::number(polygon->pen().style()));
             break;
-          }
-          case 6 :
-          {
+          } case 6 : {
             qDebug() << "Line";
             QGraphicsLineItem *line;
             line = qgraphicsitem_cast<QGraphicsLineItem*>(_area->items().value(i));
@@ -487,9 +621,7 @@ void MainWindow::_save(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(line->pen().style()));
             break;
-          }
-          case 8 :
-          {
+          } case 8 : {
             qDebug() << "Text";
             QGraphicsTextItem *text;
             text = qgraphicsitem_cast<QGraphicsTextItem*>(_area->items().value(i));
@@ -532,8 +664,7 @@ void MainWindow::_saveAs(void) {
         xmlWriter.writeAttribute("type", QString::number(number));
         xmlWriter.writeAttribute("color", QString::number(_area->items().value(i)->data(0).toInt()));
         switch(number) {
-          case 3:
-          {
+          case 3: {
             qDebug() << "Rectangle";
             QGraphicsRectItem *rectangle;
             rectangle = qgraphicsitem_cast<QGraphicsRectItem*>(_area->items().value(i));
@@ -547,9 +678,7 @@ void MainWindow::_saveAs(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(rectangle->pen().style()));
             break;
-          }
-          case 4:
-          {
+          } case 4: {
             qDebug() << "Circle";
             QGraphicsEllipseItem *circle;
             circle = qgraphicsitem_cast<QGraphicsEllipseItem*>(_area->items().value(i));
@@ -563,9 +692,7 @@ void MainWindow::_saveAs(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(circle->pen().style()));
             break;
-          }
-          case 5:
-          {
+          } case 5: {
             qDebug() << "Polygon";
             QGraphicsPolygonItem *polygon;
             polygon = qgraphicsitem_cast<QGraphicsPolygonItem*>(_area->items().value(i));
@@ -587,9 +714,7 @@ void MainWindow::_saveAs(void) {
             }
             xmlWriter.writeAttribute("style", QString::number(polygon->pen().style()));
             break;
-          }
-          case 6 :
-          {
+          } case 6 : {
             qDebug() << "Line";
             QGraphicsLineItem *line;
             line = qgraphicsitem_cast<QGraphicsLineItem*>(_area->items().value(i));
@@ -603,9 +728,7 @@ void MainWindow::_saveAs(void) {
             xmlWriter.writeAttribute("h", QString::number(height));
             xmlWriter.writeAttribute("style", QString::number(line->pen().style()));
             break;
-          }
-          case 8 :
-          {
+          } case 8 : {
             qDebug() << "Text";
             QGraphicsTextItem *text;
             text = qgraphicsitem_cast<QGraphicsTextItem*>(_area->items().value(i));
@@ -630,31 +753,6 @@ void MainWindow::_saveAs(void) {
 void MainWindow::_exit(void) {
   qDebug() << "MainWindow::_exit(void)";
   exit(0);
-}
-
-// STYLE METHODS
-void MainWindow::_penColor() {
-  qDebug() << "MainWindow::_penColor(void)";
-}
-
-void MainWindow::_penLine() {
-  qDebug() << "MainWindow::_penLine(void)";
-}
-
-void MainWindow::_penWidth() {
-  qDebug() << "MainWindow::_penWidth(void)";
-}
-
-void MainWindow::_brushColor() {
-  qDebug() << "MainWindow::_brushColor(void)";
-}
-
-void MainWindow::_brushFill() {
-  qDebug() << "MainWindow::_brushFill(void)";
-}
-
-void MainWindow::_font() {
-  qDebug() << "MainWindow::_font(void)";
 }
 
 // HELP METHODS

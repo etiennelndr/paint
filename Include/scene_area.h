@@ -26,19 +26,40 @@ class SceneArea : public QGraphicsScene
 
   public:
     SceneArea( qreal x, qreal y, qreal width, qreal height, QObject * parent);
+    QPen getPen();
     ~SceneArea();
   public slots:
     void setCurrentTool(int);
-    void setCurrentStyle(int);
+    int getCurrentTool();
+    void setCurrentPen(int tool);
+    int getCurrentPen();
+    void setCurrentWidth(int tool);
+    int getCurrentWidth();
+    void setCurrentColorP(int tool);
+    int getCurrentColorP();
+    void setCurrentColorB(int tool);
+    int getCurrentColorB();
+    void setCurrentFillBrush(int tool);
+    int getCurrentFillBrush();
   protected :
     void mousePressEvent(QGraphicsSceneMouseEvent*);
     void mouseMoveEvent(QGraphicsSceneMouseEvent*);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
   private :
-    int _currentTool, _currentStyle;
-    QPointF  _startPoint,_endPoint, _offset;
+    int _currentTool;
+    int _currentToolPen;
+    int _currentToolWidth;
+    int _currentPColor;
+    int _currentBColor;
+    int _currentFillBrush;
+
+    QPointF  _startPoint, _endPoint, _offset;
     QGraphicsItem * _item;
+    QGraphicsTextItem * _text;
     QPolygon _polygon;
+    QString _text_input;
+    QPen _pen;
+    QBrush _brush;
     // These two variables are used for freehand action
     QPointF previous;
     QGraphicsPathItem *path;
